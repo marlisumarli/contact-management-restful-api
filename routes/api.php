@@ -20,3 +20,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/users', [\App\Http\Controllers\UserController::class, 'register']);
 Route::post('/users/login', [\App\Http\Controllers\UserController::class, 'login']);
+
+Route::middleware([\App\Http\Middleware\ApiAuthMiddleware::class])->group(function () {
+    Route::get('/users/current', [\App\Http\Controllers\UserController::class, 'getCurrenUser']);
+    Route::patch('/users/current', [\App\Http\Controllers\UserController::class, 'updateUser']);
+    Route::delete('users/logout', [\App\Http\Controllers\UserController::class, 'logout']);
+
+    Route::post('/contacts', [\App\Http\Controllers\ContactController::class, 'contactCreate']);
+    Route::get('/contacts/{id:}', [\App\Http\Controllers\ContactController::class, 'contactDetail'])->where('id', '[0-9]+');
+});

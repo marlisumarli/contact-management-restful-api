@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -22,7 +24,7 @@ class UserController extends Controller
             throw new HttpResponseException(response([
                 'error' => [
                     'username' => [
-                        'username already registered'
+                        'Username already registered'
                     ]
                 ]
             ], 400));
@@ -44,7 +46,7 @@ class UserController extends Controller
             throw new HttpResponseException(response([
                 'error' => [
                     'message' => [
-                        'username or password wrong'
+                        'Username or password wrong'
                     ]
                 ]
             ], 401));
@@ -56,5 +58,34 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
+    public function getCurrenUser(Request $request): UserResource
+    {
+        $user = Auth::user();
 
+        return new UserResource($user);
+    }
+
+    public function updateUser(UserUpdateRequest $request): UserResource
+    {
+        $data = $request->validated();
+        $user = Auth::user();
+
+        $user->fill(array_filter([
+            'name' => $data['name'] ?? null,
+            'password' => isset($data['password']) ? Hash::make($data['password']) : null,
+        ]))->save();
+
+        return new UserResource($user);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $user->token = null;
+        $user->save();
+
+        return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiAuthMiddleware
@@ -17,14 +18,19 @@ class ApiAuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->header('Authorization');
+        $user = User::where('token', $token)->first();
 
-        if (!$token || !User::where('token', $token)->exists()) {
+        if (!$token || !$user) {
             return response()->json([
                 'error' => [
-                    'message' => 'unauthorized',
+                    'message' => [
+                        'Unauthorized'
+                    ],
                 ],
             ], 401);
         }
+
+        Auth::login($user);
 
         return $next($request);
     }
