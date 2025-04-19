@@ -26,6 +26,9 @@ Route::middleware([\App\Http\Middleware\ApiAuthMiddleware::class])->group(functi
     Route::patch('/users/current', [\App\Http\Controllers\UserController::class, 'updateUser']);
     Route::delete('users/logout', [\App\Http\Controllers\UserController::class, 'logout']);
 
-    Route::post('/contacts', [\App\Http\Controllers\ContactController::class, 'contactCreate']);
-    Route::get('/contacts/{id:}', [\App\Http\Controllers\ContactController::class, 'contactDetail'])->where('id', '[0-9]+');
+    Route::post('/contacts', [\App\Http\Controllers\ContactController::class, 'createContact']);
+    Route::get('/contacts', [\App\Http\Controllers\ContactController::class, 'searchContact']);
+    Route::get('/contacts/{id:}', [\App\Http\Controllers\ContactController::class, 'detailContact'])->where('id', '[0-9]+');
+    Route::put('/contacts/{id:}', [\App\Http\Controllers\ContactController::class, 'updateContact'])->where('id', '[0-9]+');
+    Route::delete('/contacts/{id:}', [\App\Http\Controllers\ContactController::class, 'deleteContact'])->where('id', '[0-9]+');
 });
